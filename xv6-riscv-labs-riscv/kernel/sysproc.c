@@ -98,9 +98,9 @@ sys_uptime(void)
 // --- DG ---
 uint64 sys_wait2(void)
 {
-  unint64 val;
-  unint64 val_ptr;
-  if(argaddr(0, &val) < 0){return -1}
+  uint64 val;
+  uint64 val_ptr;
+  if(argaddr(0, &val) < 0){return -1;}
   if(argaddr(1, &val_ptr) < 0){return -1;}
   return wait2(val, val_ptr);
 }
