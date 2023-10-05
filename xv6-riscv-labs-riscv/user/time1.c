@@ -7,33 +7,31 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    // Start timing
+    // Timer starts
     int start_time = uptime();
 
-    // Fork a child process to execute the command
+    // Fork child process
     int pid = fork();
     if (pid < 0) {
         fprintf(2, "Fork failed\n");
         exit(1);
     } else if (pid == 0) {
-        // This is the child process
+        // Child process
         exec(argv[1], argv + 1);
-        // If exec() fails, print an error message and exit
+        // If exec() fails -> exit
         fprintf(2, "exec failed\n");
         exit(1);
     } else {
-        // This is the parent process
+        // Parent process
         int status;
         wait(&status);
 
-        // Stop timing
+        // Timer ends
         int end_time = uptime();
 
-        // Calculate and print elapsed time
+        // Elapsed time
         int elapsed_time = end_time - start_time;
         printf("Time: %d ticks\n", elapsed_time);
-
-        // Print elapsed time in a different format
         printf("elapsed time: %d ticks\n", elapsed_time);
     }
 
