@@ -4,6 +4,7 @@
 #include "riscv.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "pstat.h"
 #include "defs.h"
 #include "pstat.h"
 
@@ -33,7 +34,6 @@ struct spinlock wait_lock;
 void
 proc_mapstacks(pagetable_t kpgtbl) {
   struct proc *p;
- 
   for(p = proc; p < &proc[NPROC]; p++) {
     char *pa = kalloc();
     if(pa == 0)
@@ -48,7 +48,6 @@ void
 procinit(void)
 {
   struct proc *p;
- 
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
@@ -686,7 +685,6 @@ procinfo(uint64 addr)
   }
   return nprocs;
 }
-
 int
 wait2(uint64 addr, uint64 addr1)
 {

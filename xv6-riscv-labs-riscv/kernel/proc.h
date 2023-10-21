@@ -80,7 +80,6 @@ struct trapframe {
   /* 280 */ uint64 t6;
 };
 
-
 // Per-process state
 struct proc {
   struct spinlock lock;
