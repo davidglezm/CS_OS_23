@@ -1,7 +1,8 @@
 struct stat;
 struct rtcdate;
 struct pstat;
-
+struct rusage;
+struct rupriority;
 // system calls
 int fork(void);
 int exit(int) __attribute__((noreturn));
@@ -18,6 +19,11 @@ int unlink(const char*);
 int fstat(int fd, struct stat*);
 int link(const char*, const char*);
 int mkdir(const char*);
+int time1(const char*);
+int time(const char*);
+int pexec(const char*);
+int sleep(int);
+int matmul(const char*);
 int chdir(const char*);
 int dup(int);
 int getpid(void);
@@ -25,6 +31,8 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int getprocs(struct pstat*);
+int getpriority(struct rupriority*);
+int setpriority(struct rupriority*);
 
 // ulib.c
 int stat(const char*, struct stat*);

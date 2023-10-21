@@ -39,6 +39,24 @@ sys_wait(void)
 }
 
 uint64
+sys_getpriority(void)
+{
+  uint64 p;
+  if(argaddr(0, &p) < 0)
+    return -1;
+  return wait(p);
+}
+
+uint64
+sys_setpriority(void)
+{
+  uint64 p;
+  if(argaddr(0, &p) < 0)
+    return -1;
+  return wait(p);
+}
+
+uint64
 sys_sbrk(void)
 {
   int addr;
@@ -83,8 +101,7 @@ sys_kill(void)
   return kill(pid);
 }
 
-// return how many clock tick interrupts have occurred
-// since start.
+// Return # of clock interrupts
 uint64
 sys_uptime(void)
 {
@@ -96,8 +113,7 @@ sys_uptime(void)
   return xticks;
 }
 
-// return the number of active processes in the system
-// fill in user-provided data structure with pid,state,sz,ppid,name
+// Return # of active processes
 uint64
 sys_getprocs(void)
 {
