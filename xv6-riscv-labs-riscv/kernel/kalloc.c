@@ -55,6 +55,7 @@ kfree(void *pa)
   memset(pa, 1, PGSIZE);
 
   r = (struct run*)pa;
+  // kfree_phys_page(pa);
 
   acquire(&kmem.lock);
   r->next = kmem.freelist;
@@ -80,3 +81,15 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
 }
+
+// void
+// kfree_phys_page(void *pa)
+// {
+//   // struct run * = (struct run *)pa;
+//   // acquire(&kmem.lock);
+//   // r->next = kmem.freelist;
+//   // kmem.freelist = r;
+//   // release(&kmem.lock);
+// }
+
+

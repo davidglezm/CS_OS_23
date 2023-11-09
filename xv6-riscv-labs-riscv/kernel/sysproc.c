@@ -107,3 +107,10 @@ sys_getprocs(void)
     return -1;
   return(procinfo(addr));
 }
+
+//Free memory 
+uint64
+sys_freepmem(void)
+{
+  return -1;
+}
