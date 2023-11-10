@@ -9,6 +9,7 @@
 #include "riscv.h"
 #include "defs.h"
 
+uint64 freepmem(void); // HW 4 - Task 1
 void freerange(void *pa_start, void *pa_end);
 
 extern char end[]; // first address after kernel.
@@ -80,3 +81,34 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
 }
+
+// HW 4 - Task 1
+// Function for returning total free memory 
+uint64 freepmem(void){
+  
+  int numOfPages = 0;
+  struct run *r;
+
+  // Acquire a lock to ensure exclusive access to kernel memory management.
+  acquire(&kmem.lock);
+  
+  // Initialize a pointer 'r' to the head of the free memory list.
+  r = kmem.freelist;
+
+  // Traverse the free memory list and count the number of pages.
+  while(r){
+    numOfPages++;
+    r = r->next;
+  }
+  
+  // Release the lock to allow other threads to access the memory management.
+  release(&kmem.lock);
+
+  // Calculate the amount of free memory in bytes by multiplying one page size (PGSIZE) 
+  // times the total number of pages availble.
+  int totalFreeMem = numOfPages * PGSIZE;
+
+  // Return the total amount of free memory in bytes.
+  return totalFreeMem;
+}
+

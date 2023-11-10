@@ -107,3 +107,11 @@ sys_getprocs(void)
     return -1;
   return(procinfo(addr));
 }
+
+// HW 4 - Task 1
+// system call that allows user to query total free memory
+uint64
+sys_freepmem(void){
+  int res = freepmem();
+  return res;
+}
