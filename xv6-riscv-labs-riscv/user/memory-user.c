@@ -9,6 +9,9 @@ int main(int argc, char *argv[]) {
     uint start = atoi(argv[1]);
     uint limit = atoi(argv[2]);
     uint increment = atoi(argv[3]);
+    if (increment == 0){
+        exit(0);
+    }
     uint i;
     // uint j;
     int *array;
