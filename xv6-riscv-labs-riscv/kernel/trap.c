@@ -67,7 +67,46 @@ usertrap(void)
     syscall();
   } else if((which_dev = devintr()) != 0){
     // ok
-  } else {
+  } 
+  //HW 4 - TASK 3
+  // Check if the cause of the exception is a load or store page fault:
+  // scause 13: load page fault, 15: store page fault
+  else if(r_scause() == 13 || r_scause() == 15){
+
+  // Check if the faulting address is within the process's allocated memory space
+  if (r_stval() < p->sz){
+
+    // Allocate a physical frame of memory. If allocation fails, physical_frame will be NULL
+    char* physical_frame = kalloc();
+    
+    // Check if the memory allocation failed (i.e., physical_frame is NULL)
+    if(physical_frame == 0){
+
+      printf("usertrap(): out of memory, pid=%d, fault_address=%p\n", p->pid, r_stval());
+
+      // Mark the process to be killed due to critical fault
+      p->killed = 1;
+
+      exit(-1);
+
+    } else {
+        // If memory allocation was successful
+        // Initialize the allocated memory to zero
+        memset((void*)physical_frame, 0, PGSIZE);
+
+        // Map the physical frame to the process's address space
+        mappages(p->pagetable, PGROUNDDOWN(r_stval()), PGSIZE, (uint64)physical_frame, (PTE_R | PTE_W | PTE_X | PTE_U));
+      
+      }
+    }
+    else {
+      // This branch handles the case where the fault is not a load or store page fault
+      printf("usertrap(): unexpected page fault, pid=%d, fault_address=%p\n", p->pid, r_stval());
+
+      p->killed = 1;
+    }
+  }
+  else {
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
     p->killed = 1;
@@ -218,3 +257,22 @@ devintr()
   }
 }
 
+// else if(r_scause() == 13 || r_scause() == 15){
+//     uint64 faulting_addr = r_stval();
+//     if (faulting_addr < p->sz){
+//       char* physical_frame = kalloc();
+//       if(physical_frame == 0){
+//         printf("usertrap(): out of memory, pid=%d, faulting_address=%p\n", p->pid, faulting_addr);
+//         p->killed = 1;
+//         exit(-1);
+//       } else {
+//         memset((void*)physical_frame, 0, PGSIZE);
+//         mappages(p->pagetable, PGROUNDDOWN(faulting_addr), PGSIZE,(uint64)physical_frame, (PTE_R | PTE_W | PTE_X | PTE_U));
+//       }
+//     }
+//   }
+//   else {
+//     uint64 faulting_addr = r_stval();
+//     printf("usertrap(): out of memory, pid=%d, faulting_address=%p\n", p->pid, faulting_addr);
+//     p->killed = 1;
+//   }
