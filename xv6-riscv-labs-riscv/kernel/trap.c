@@ -256,23 +256,3 @@ devintr()
     return 0;
   }
 }
-
-// else if(r_scause() == 13 || r_scause() == 15){
-//     uint64 faulting_addr = r_stval();
-//     if (faulting_addr < p->sz){
-//       char* physical_frame = kalloc();
-//       if(physical_frame == 0){
-//         printf("usertrap(): out of memory, pid=%d, faulting_address=%p\n", p->pid, faulting_addr);
-//         p->killed = 1;
-//         exit(-1);
-//       } else {
-//         memset((void*)physical_frame, 0, PGSIZE);
-//         mappages(p->pagetable, PGROUNDDOWN(faulting_addr), PGSIZE,(uint64)physical_frame, (PTE_R | PTE_W | PTE_X | PTE_U));
-//       }
-//     }
-//   }
-//   else {
-//     uint64 faulting_addr = r_stval();
-//     printf("usertrap(): out of memory, pid=%d, faulting_address=%p\n", p->pid, faulting_addr);
-//     p->killed = 1;
-//   }
