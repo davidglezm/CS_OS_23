@@ -47,7 +47,7 @@ forktest(void)
 
   print("fork test\n");
   3a:	00000517          	auipc	a0,0x0
-  3e:	40650513          	addi	a0,a0,1030 # 440 <freepmem+0xe>
+  3e:	41650513          	addi	a0,a0,1046 # 450 <munmap+0xe>
   42:	00000097          	auipc	ra,0x0
   46:	fbe080e7          	jalr	-66(ra) # 0 <print>
 
@@ -71,7 +71,7 @@ forktest(void)
   if(n == N){
     print("fork claimed to work N times!\n");
   64:	00000517          	auipc	a0,0x0
-  68:	3ec50513          	addi	a0,a0,1004 # 450 <freepmem+0x1e>
+  68:	3fc50513          	addi	a0,a0,1020 # 460 <munmap+0x1e>
   6c:	00000097          	auipc	ra,0x0
   70:	f94080e7          	jalr	-108(ra) # 0 <print>
     exit(1);
@@ -113,7 +113,7 @@ forktest(void)
 
   print("fork test OK\n");
   b4:	00000517          	auipc	a0,0x0
-  b8:	3ec50513          	addi	a0,a0,1004 # 4a0 <freepmem+0x6e>
+  b8:	3fc50513          	addi	a0,a0,1020 # 4b0 <munmap+0x6e>
   bc:	00000097          	auipc	ra,0x0
   c0:	f44080e7          	jalr	-188(ra) # 0 <print>
 }
@@ -125,7 +125,7 @@ forktest(void)
   ce:	8082                	ret
       print("wait stopped early\n");
   d0:	00000517          	auipc	a0,0x0
-  d4:	3a050513          	addi	a0,a0,928 # 470 <freepmem+0x3e>
+  d4:	3b050513          	addi	a0,a0,944 # 480 <munmap+0x3e>
   d8:	00000097          	auipc	ra,0x0
   dc:	f28080e7          	jalr	-216(ra) # 0 <print>
       exit(1);
@@ -134,7 +134,7 @@ forktest(void)
   e6:	2a8080e7          	jalr	680(ra) # 38a <exit>
     print("wait got too many\n");
   ea:	00000517          	auipc	a0,0x0
-  ee:	39e50513          	addi	a0,a0,926 # 488 <freepmem+0x56>
+  ee:	3ae50513          	addi	a0,a0,942 # 498 <munmap+0x56>
   f2:	00000097          	auipc	ra,0x0
   f6:	f0e080e7          	jalr	-242(ra) # 0 <print>
     exit(1);
@@ -809,3 +809,23 @@ freepmem:
  434:	00000073          	ecall
  ret
  438:	8082                	ret
+
+000000000000043a <mmap>:
+.global mmap
+mmap:
+ li a7, SYS_mmap
+ 43a:	48e1                	li	a7,24
+ ecall
+ 43c:	00000073          	ecall
+ ret
+ 440:	8082                	ret
+
+0000000000000442 <munmap>:
+.global munmap
+munmap:
+ li a7, SYS_munmap
+ 442:	48e5                	li	a7,25
+ ecall
+ 444:	00000073          	ecall
+ ret
+ 448:	8082                	ret

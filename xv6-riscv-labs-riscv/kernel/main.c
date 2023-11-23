@@ -41,5 +41,7 @@ main()
     plicinithart();   // ask PLIC for device interrupts
   }
 
-  scheduler();        
+  scheduler();  
+  // HW5 - Task 1a
+  mmrlistinit();      
 }
