@@ -94,10 +94,10 @@ usertrap(void)
     }
     //Allocate a physical memory frame (hint: use kalloc()).
       void *physical_mem = kalloc();
-    //Allocating memory works
+      //Allocating memory works
       if(physical_mem){
         
-       // Map the new frame into the process’s page table (hint: use mappages()).
+        // Map the new frame into the process’s page table (hint: use mappages()).
         if(mappages(p->pagetable, PGROUNDDOWN(r_stval()), PGSIZE, (uint64)physical_mem, (PTE_R | PTE_W | PTE_X | PTE_U)) < 0){ 
           kfree(physical_mem);
           printf("mappages didn't work\n");

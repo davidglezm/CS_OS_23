@@ -16,47 +16,48 @@ typedef struct {
 
 buffer_t *buffer;
 
-void producer()
+void *producer()
 {
     while(1) {
-        if (buffer->num_produced >= MAX)
-	    return;
+        if (buffer->num_produced >= MAX) {
+	    exit(0);
+	}
 	buffer->num_produced++;
 	buffer->buf[buffer->nextin++] = buffer->num_produced;
 	buffer->nextin %= BSIZE;
     }
 }
 
-void consumer()
+void *consumer()
 {
     while(1) {
-        if (buffer->num_consumed >= MAX) 
-	    return;
+        if (buffer->num_consumed >= MAX) {
+	    exit(0);
+	}
 	buffer->total += buffer->buf[buffer->nextout++];
 	buffer->nextout %= BSIZE;
 	buffer->num_consumed++;
     }
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     buffer = (buffer_t *) mmap(NULL, sizeof(buffer_t),
 		               PROT_READ | PROT_WRITE,
-			       MAP_ANONYMOUS | MAP_PRIVATE,
-			       -1, 0);
+			       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     buffer->nextin = 0;
     buffer->nextout = 0;
     buffer->num_produced = 0;
     buffer->num_consumed = 0;
     buffer->total = 0;
-
-    producer();
-    consumer();
-
+    if (!fork())
+        producer();
+    else
+	wait(0);
+    if (!fork())
+        consumer();
+    else
+	wait(0);
     printf("total = %d\n", buffer->total);
-
-   // munmap(buffer, sizeof(buffer_t));
-
     exit(0);
-}
+}   
