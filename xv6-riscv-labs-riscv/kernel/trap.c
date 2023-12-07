@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "stat.h"
 
 struct spinlock tickslock;
 uint ticks;
@@ -29,25 +30,20 @@ trapinithart(void)
   w_stvec((uint64)kernelvec);
 }
 
-//
-// handle an interrupt, exception, or system call from user space.
-// called from trampoline.S
-//
+
 void
 usertrap(void)
 {
   int which_dev = 0;
 
   if((r_sstatus() & SSTATUS_SPP) != 0)
-    panic("usertrap: not from user mode");
+    panic("usertrap: Not user mode");
 
-  // send interrupts and exceptions to kerneltrap(),
-  // since we're now in the kernel.
   w_stvec((uint64)kernelvec);
 
   struct proc *p = myproc();
   
-  // save user program counter.
+  // Keep track of user program counter 
   p->trapframe->epc = r_sepc();
   
   if(r_scause() == 8){
@@ -67,46 +63,56 @@ usertrap(void)
     syscall();
   } else if((which_dev = devintr()) != 0){
     // ok
-  } 
-  //HW 4 - TASK 3
-  // Check if the cause of the exception is a load or store page fault:
-  // scause 13: load page fault, 15: store page fault
-  else if(r_scause() == 13 || r_scause() == 15){
 
-  // Check if the faulting address is within the process's allocated memory space
-  if (r_stval() < p->sz){
 
-    // Allocate a physical frame of memory. If allocation fails, physical_frame will be NULL
-    char* physical_frame = kalloc();
-    
-    // Check if the memory allocation failed (i.e., physical_frame is NULL)
-    if(physical_frame == 0){
+    //HW5 - TASK 1
+    // Check whether scause is either 13 (load fault) or 15 (store fault)
+  } else if(r_scause() == 13 || r_scause() == 15){
 
-      printf("usertrap(): out of memory, pid=%d, fault_address=%p\n", p->pid, r_stval());
-
-      // Mark the process to be killed due to critical fault
-      p->killed = 1;
-
-      exit(-1);
-
-    } else {
-        // If memory allocation was successful
-        // Initialize the allocated memory to zero
-        memset((void*)physical_frame, 0, PGSIZE);
-
-        // Map the physical frame to the process's address space
-        mappages(p->pagetable, PGROUNDDOWN(r_stval()), PGSIZE, (uint64)physical_frame, (PTE_R | PTE_W | PTE_X | PTE_U));
+    if(r_stval() >= p->sz){
       
+      //Check whether the mapped region protection permits the operation
+      for(int i=0; i<MAX_MMR; i++){
+        if(p->mmr[i].valid && p->mmr[i].addr < r_stval() && p->mmr[i].addr+p->mmr[i].length > r_stval()){
+          if(r_scause() == 13){
+            //Read permission
+            if((p->mmr[i].prot & PROT_READ) == 0){
+              p->killed = 1;
+              exit(-1);
+            }
+          }
+          if(r_scause() == 15){
+            //Write permission
+            if((p->mmr[i].prot & PROT_WRITE) == 0){
+              p->killed = 1;
+              exit(-1);
+            }
+          }
+        }
+      }  
+      
+    }
+    //Allocate a physical memory frame (hint: use kalloc()).
+      void *physical_mem = kalloc();
+    //Allocating memory works
+      if(physical_mem){
+        
+       // Map the new frame into the process’s page table (hint: use mappages()).
+        if(mappages(p->pagetable, PGROUNDDOWN(r_stval()), PGSIZE, (uint64)physical_mem, (PTE_R | PTE_W | PTE_X | PTE_U)) < 0){ 
+          kfree(physical_mem);
+          printf("mappages didn't work\n");
+          p->killed = 1;
+          exit(-1);
+        }
+        
+      }else{
+      printf("usertrap(): Out of memory\n");
+        p->killed = 1;
+        exit(-1);
       }
-    }
-    else {
-      // This branch handles the case where the fault is not a load or store page fault
-      printf("usertrap(): unexpected page fault, pid=%d, fault_address=%p\n", p->pid, r_stval());
-
-      p->killed = 1;
-    }
-  }
-  else {
+    
+  
+  } else {
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
     p->killed = 1;
@@ -115,7 +121,6 @@ usertrap(void)
   if(p->killed)
     exit(-1);
 
-  // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
     yield();
 

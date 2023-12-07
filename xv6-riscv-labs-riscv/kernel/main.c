@@ -29,6 +29,7 @@ main()
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
     userinit();      // first user process
+    mmrlistinit();   //  HW5 - Task 1a
     __sync_synchronize();
     started = 1;
   } else {
@@ -42,6 +43,6 @@ main()
   }
 
   scheduler();  
-  // HW5 - Task 1a
-  mmrlistinit();      
+  // // HW5 - Task 1a
+  // mmrlistinit();      
 }

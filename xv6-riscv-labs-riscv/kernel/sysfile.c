@@ -593,10 +593,8 @@ sys_munmap(void)
   uint64 length;
 
   // HW5 - Task 1a
-  if(argaddr(0, &addr) < 0)
+  if(argaddr(0, &addr) < 0 || argaddr(1, &length) < 0)
         return -1;
-  if(argaddr(1, &length) < 0)
-       return -1;
-  munmap(addr, length);
-  return 0;
+  return munmap(addr, length);
+  // return 0;
 }
