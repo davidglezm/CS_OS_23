@@ -28,6 +28,11 @@ int getprocs(struct pstat*);
 uint64 freepmem(void); //HW 4-Task 1
 void* mmap(void*, int, int, int, int, void*); //HW5-Task 1a
 int munmap(void*, int); //HW5-Task 1a
+// HW6 - Task 1
+int sem_init(void*, int, int);
+int sem_destroy(void*);
+int sem_wait(void*);
+int sem_post(void*);
 
 // ulib.c
 int stat(const char*, struct stat*);
