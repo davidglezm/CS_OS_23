@@ -1,3 +1,5 @@
+//# include "param.h"
+#define NSEM 100
 // Mutual exclusion lock.
 struct spinlock {
   uint locked;       // Is the lock held?
@@ -7,3 +9,15 @@ struct spinlock {
   struct cpu *cpu;   // The cpu holding the lock.
 };
 
+// HW6 - Task 2: Counting semaphore
+struct semaphore {
+  struct spinlock lock; // semaphore lock
+  int count; // semaphore value
+  int valid; // 1 if this entry is in use
+};
+// OS semaphore table type
+struct semtab {
+  struct spinlock lock;
+  struct semaphore sem[NSEM];
+};
+extern struct semtab semtable;

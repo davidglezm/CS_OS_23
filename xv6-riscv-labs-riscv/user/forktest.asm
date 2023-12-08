@@ -47,7 +47,7 @@ forktest(void)
 
   print("fork test\n");
   3a:	00000517          	auipc	a0,0x0
-  3e:	41650513          	addi	a0,a0,1046 # 450 <munmap+0xe>
+  3e:	43650513          	addi	a0,a0,1078 # 470 <sem_post+0xe>
   42:	00000097          	auipc	ra,0x0
   46:	fbe080e7          	jalr	-66(ra) # 0 <print>
 
@@ -71,7 +71,7 @@ forktest(void)
   if(n == N){
     print("fork claimed to work N times!\n");
   64:	00000517          	auipc	a0,0x0
-  68:	3fc50513          	addi	a0,a0,1020 # 460 <munmap+0x1e>
+  68:	41c50513          	addi	a0,a0,1052 # 480 <sem_post+0x1e>
   6c:	00000097          	auipc	ra,0x0
   70:	f94080e7          	jalr	-108(ra) # 0 <print>
     exit(1);
@@ -113,7 +113,7 @@ forktest(void)
 
   print("fork test OK\n");
   b4:	00000517          	auipc	a0,0x0
-  b8:	3fc50513          	addi	a0,a0,1020 # 4b0 <munmap+0x6e>
+  b8:	41c50513          	addi	a0,a0,1052 # 4d0 <sem_post+0x6e>
   bc:	00000097          	auipc	ra,0x0
   c0:	f44080e7          	jalr	-188(ra) # 0 <print>
 }
@@ -125,7 +125,7 @@ forktest(void)
   ce:	8082                	ret
       print("wait stopped early\n");
   d0:	00000517          	auipc	a0,0x0
-  d4:	3b050513          	addi	a0,a0,944 # 480 <munmap+0x3e>
+  d4:	3d050513          	addi	a0,a0,976 # 4a0 <sem_post+0x3e>
   d8:	00000097          	auipc	ra,0x0
   dc:	f28080e7          	jalr	-216(ra) # 0 <print>
       exit(1);
@@ -134,7 +134,7 @@ forktest(void)
   e6:	2a8080e7          	jalr	680(ra) # 38a <exit>
     print("wait got too many\n");
   ea:	00000517          	auipc	a0,0x0
-  ee:	3ae50513          	addi	a0,a0,942 # 498 <munmap+0x56>
+  ee:	3ce50513          	addi	a0,a0,974 # 4b8 <sem_post+0x56>
   f2:	00000097          	auipc	ra,0x0
   f6:	f0e080e7          	jalr	-242(ra) # 0 <print>
     exit(1);
@@ -829,3 +829,43 @@ munmap:
  444:	00000073          	ecall
  ret
  448:	8082                	ret
+
+000000000000044a <sem_init>:
+.global sem_init
+sem_init:
+ li a7, SYS_sem_init
+ 44a:	48e9                	li	a7,26
+ ecall
+ 44c:	00000073          	ecall
+ ret
+ 450:	8082                	ret
+
+0000000000000452 <sem_destroy>:
+.global sem_destroy
+sem_destroy:
+ li a7, SYS_sem_destroy
+ 452:	48ed                	li	a7,27
+ ecall
+ 454:	00000073          	ecall
+ ret
+ 458:	8082                	ret
+
+000000000000045a <sem_wait>:
+.global sem_wait
+sem_wait:
+ li a7, SYS_sem_wait
+ 45a:	48f1                	li	a7,28
+ ecall
+ 45c:	00000073          	ecall
+ ret
+ 460:	8082                	ret
+
+0000000000000462 <sem_post>:
+.global sem_post
+sem_post:
+ li a7, SYS_sem_post
+ 462:	48f5                	li	a7,29
+ ecall
+ 464:	00000073          	ecall
+ ret
+ 468:	8082                	ret

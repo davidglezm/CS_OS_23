@@ -151,3 +151,88 @@ sys_sbrk(void){
 //     return -1;
 //   return addr;
 // }
+
+// HW6 - TASK 3
+int sys_sem_init(void) {
+    uint64 s;
+    int index, value, pshared;
+
+    // Retrieve semaphore pointer, pshared flag, and initial value from syscall arguments
+    // Return error if any syscall argument retrieval fails or pshared is zero
+    if (argaddr(0, &s) < 0 || argint(1, &pshared) < 0 || argint(2, &value) < 0 || pshared == 0) {
+        return -1;
+    }
+
+    // Allocate a new semaphore and check for allocation success
+    index = semalloc();
+    if (index < 0) {
+        return -1;
+    }
+
+    // Set the semaphore's initial value
+    semtable.sem[index].count = value;
+
+    // Copy the semaphore index back to the user space and return success or error
+    return copyout(myproc()->pagetable, s, (char*)&index, sizeof(index)) < 0 ? -1 : 0;
+}
+
+int sys_sem_destroy(void) {
+    uint64 s;
+    int addr;
+
+    // Retrieve semaphore pointer from syscall argument
+    if (argaddr(0, &s) < 0) {
+        return -1;
+    }
+
+    // Copy semaphore address from user space; return error if copyin fails
+    if (copyin(myproc()->pagetable, (char*)&addr, s, sizeof(int)) < 0) {
+        return -1;
+    }
+
+    // Acquire lock, deallocate the semaphore, and release lock
+    acquire(&semtable.lock);
+    semdealloc(addr);
+    release(&semtable.lock);
+
+    return 0;
+}
+
+int sys_sem_wait(void) {
+    uint64 s;
+    int addr;
+
+    // Retrieve semaphore pointer from syscall argument and copy address from user space
+    if (argaddr(0, &s) < 0 || copyin(myproc()->pagetable, (char*)&addr, s, sizeof(int)) < 0) {
+        return -1;
+    }
+
+    // Acquire lock and wait if semaphore count is zero, then decrement count
+    acquire(&semtable.sem[addr].lock);
+    while (semtable.sem[addr].count == 0) {
+        sleep((void*)&semtable.sem[addr], &semtable.sem[addr].lock);
+    }
+    semtable.sem[addr].count--;
+    release(&semtable.sem[addr].lock);
+
+    return 0;
+}
+
+int sys_sem_post(void) {
+    uint64 s;
+    int addr;
+
+    // Retrieve semaphore pointer from syscall argument and copy address from user space
+    if (argaddr(0, &s) < 0 || copyin(myproc()->pagetable, (char*)&addr, s, sizeof(int)) < 0) {
+        return -1;
+    }
+
+    // Acquire lock, increment semaphore count, signal any waiting process, and release lock
+    acquire(&semtable.sem[addr].lock);
+    semtable.sem[addr].count++;
+    wakeup((void*)&semtable.sem[addr]);
+    release(&semtable.sem[addr].lock);
+
+    return 0;
+}
+

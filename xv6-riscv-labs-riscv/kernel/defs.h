@@ -9,6 +9,12 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+// HW6 - Task 2
+// semaphore.c
+void seminit(void);
+int  semalloc(void);
+void semdealloc(int);
+
 // bio.c
 void            binit(void);
 struct buf*     bread(uint, uint);

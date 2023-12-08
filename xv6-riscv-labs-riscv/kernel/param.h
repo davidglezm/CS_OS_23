@@ -13,5 +13,6 @@
 #define MAXPATH      128   // maximum file path name
 // HW5 - Task 1a
 #define MAX_MMR	10   // maximum number of memory-mapped regions per process
-
+//HW6 - Task 2
+#define NSEM 100     // Max open sem per system
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
